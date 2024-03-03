@@ -170,7 +170,7 @@ const data = [
     const main = createMain();
     const buttonGroup = createButtonsGroup([
       {
-        className: 'btn btn-primary mr-3',
+        className: 'btn btn-primary mr-3 js-add',
         type: 'button',
         text: 'Добавить',
       },
@@ -192,6 +192,10 @@ const data = [
 
     return {
       list: table.tbody,
+      logo,
+      btnAdd: buttonGroup.btns[0],
+      formOverlay: form.overlay,
+      form: form.form,
     };
   };
 
@@ -214,6 +218,7 @@ const data = [
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
+    tr.phoneLink = phoneLink;
 
     tdPhone.append(phoneLink);
 
@@ -225,16 +230,86 @@ const data = [
   const renderContacts = (elem, data) => {
     const allRow = data.map(createRow);
     elem.append(...allRow);
+    return allRow;
   };
 
+  const hoverRow = (allRow, logo) => {
+    const text = logo.textContent;
+
+    allRow.forEach(contact => {
+      contact.addEventListener('mouseenter', () => {
+        logo.textContent = contact.phoneLink.textContent;
+      });
+      contact.addEventListener('mouseleave', () => {
+        logo.textContent = text;
+      });
+    });
+  };
+  /*
+  const bubblingCapturing = () => {
+    const btnAdd = document.querySelector('.js-add');
+    const btnWrapper = document.querySelector('.btn-wrapper');
+    const container = document.querySelector('.container');
+    const main = document.querySelector('main');
+    const app = document.querySelector('#app');
+    const body = document.querySelector('body');
+
+    btnAdd.addEventListener('click', () => {
+      console.log('btnAdd');
+    });
+    btnWrapper.addEventListener('click', () => {
+      console.log('btnWrapper');
+    });
+    container.addEventListener('click', () => {
+      console.log('container');
+    });
+    main.addEventListener('click', () => {
+      console.log('main');
+    });
+    app.addEventListener('click', () => {
+      console.log('app');
+    });
+    body.addEventListener('click', () => {
+      console.log('body');
+    });
+    document.documentElement.addEventListener('click', () => {
+      console.log('html');
+    });
+    window.addEventListener('click', () => {
+      console.log('window');
+    });
+    document.addEventListener('click', () => {
+      console.log('document');
+    });
+  };
+  */
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list} = phoneBook;
-
-    renderContacts(list, data);
+    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
     // Функционал
+    const allRow = renderContacts(list, data);
+
+    hoverRow(allRow, logo);
+
+    const objEvent = {
+      handleEvent() {
+        formOverlay.classList.add('is-visible');
+      },
+    };
+
+    btnAdd.addEventListener('click', objEvent);
+
+    form.addEventListener('click', event => {
+      event.stopPropagation();
+    });
+
+    formOverlay.addEventListener('click', () => {
+      formOverlay.classList.remove('is-visible');
+    });
+
+    // bubblingCapturing();
   };
 
   window.phoneBookInit = init;
