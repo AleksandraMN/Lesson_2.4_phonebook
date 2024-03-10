@@ -1,32 +1,28 @@
 'use strict';
 
-const data = [
-  {
-    name: 'Иван',
-    surname: 'Петров',
-    phone: '+79514545454',
-  },
-  {
-    name: 'Игорь',
-    surname: 'Семёнов',
-    phone: '+79999999999',
-  },
-  {
-    name: 'Семён',
-    surname: 'Иванов',
-    phone: '+79800252525',
-  },
-  {
-    name: 'Мария',
-    surname: 'Попова',
-    phone: '+79876543210',
-  },
-];
-
 {
+  //  getStorage которая получает в виде аргумента ключ
+  //  и по нему запрашивает данные из localStorage и
+  //  возвращает их, если их нет то возвращает пустой массив
+  const getStorage = (keys) => {
+    const data = localStorage.getItem('keys') ?
+      JSON.parse(localStorage.getItem('keys')) : [];
+    return data;
+  };
+
+  /*
   const addContactData = contact => {
     data.push(contact);
     console.log('data', data);
+  };
+*/
+  //  setStorage получает ключ и объект в виде аргументов
+  // и дописывает данные в localStorage
+  const setStorage = (keys, contact) => {
+    const data = getStorage(keys);
+    console.log(data);
+    data.push(contact);
+    localStorage.setItem('keys', JSON.stringify(data));
   };
 
   const createContainer = () => {
@@ -254,44 +250,7 @@ const data = [
       });
     });
   };
-  /*
-  const bubblingCapturing = () => {
-    const btnAdd = document.querySelector('.js-add');
-    const btnWrapper = document.querySelector('.btn-wrapper');
-    const container = document.querySelector('.container');
-    const main = document.querySelector('main');
-    const app = document.querySelector('#app');
-    const body = document.querySelector('body');
 
-    btnAdd.addEventListener('click', () => {
-      console.log('btnAdd');
-    });
-    btnWrapper.addEventListener('click', () => {
-      console.log('btnWrapper');
-    });
-    container.addEventListener('click', () => {
-      console.log('container');
-    });
-    main.addEventListener('click', () => {
-      console.log('main');
-    });
-    app.addEventListener('click', () => {
-      console.log('app');
-    });
-    body.addEventListener('click', () => {
-      console.log('body');
-    });
-    document.documentElement.addEventListener('click', () => {
-      console.log('html');
-    });
-    window.addEventListener('click', () => {
-      console.log('window');
-    });
-    document.addEventListener('click', () => {
-      console.log('document');
-    });
-  };
-  */
   const modalControl = (btnAdd, formOverlay) => {
     const openModal = () => {
       formOverlay.classList.add('is-visible');
@@ -316,6 +275,22 @@ const data = [
     };
   };
 
+  //  removeStorage получает в виде аргумента номер телефона,
+  //   и удаляет контакт из localStorage
+  const removeStorage = (value) => {
+    const data = getStorage();
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].phone === value) {
+        console.log(data[i].phone);
+        data.splice(i, 1);
+        break;
+      }
+    }
+    localStorage.setItem('keys', JSON.stringify(data));
+    console.log(data);
+  };
+
   const deleteControl = (btnDel, list) => {
     btnDel.addEventListener('click', () => {
       document.querySelectorAll('.delete').forEach(del => {
@@ -324,8 +299,12 @@ const data = [
     });
 
     list.addEventListener('click', e => {
+      console.log(e.target);
       if (e.target.closest('.del-icon')) {
+        console.log(e.target.closest('.contact').lastChild.textContent);
+        const value = e.target.closest('.contact').lastChild.textContent;
         e.target.closest('.contact').remove();
+        removeStorage(value); // удаляет контакт из localStorage
       }
     });
   };
@@ -334,7 +313,7 @@ const data = [
     list.append(createRow(contact));
   };
 
-  const formControl = (form, list, closeModal) => {
+  const formControl = (form, list, closeModal, keys) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -342,13 +321,13 @@ const data = [
       const newContact = Object.fromEntries(formData);
       console.log('newContact', newContact);
       addContactPage(newContact, list);
-      addContactData(newContact);
+      setStorage(keys, newContact); // записывает контакт в localStorage
       form.reset();
       closeModal();
     });
   };
 
-  const init = (selectorApp, title) => {
+  const init = (selectorApp, title, keys) => {
     const app = document.querySelector(selectorApp);
 
     const {
@@ -359,51 +338,41 @@ const data = [
       form,
       btnDel,
       table,
-    } = renderPhoneBook(app, title);
+    } = renderPhoneBook(app, title, keys);
 
 
     // Функционал
+    const data = getStorage(keys);
     let allRow = renderContacts(list, data);
 
     const {closeModal} = modalControl(btnAdd, formOverlay);
+    console.log(data);
     hoverRow(allRow, logo);
 
     deleteControl(btnDel, list);
-    formControl(form, list, closeModal);
+    formControl(form, list, closeModal, keys);
 
-    // bubblingCapturing();
-
+    //  сортировка по алфавиту (не доделан до конца)
     table.addEventListener('click', (e) => {
       const target = e.target;
-      console.log(allRow);
+      // console.log(allRow);
       if (target.textContent === 'Имя') {
         for (const el of allRow) {
           el.remove();
         }
         data.sort((x, y) => x.name.localeCompare(y.name));
-        allRow = renderContacts(list, data);
-        console.log(data);
+        allRow = renderContacts(list, data, keys);
+        // console.log(data);
       }
       if (target.textContent === 'Фамилия') {
         for (const el of allRow) {
           el.remove();
         }
         data.sort((x, y) => x.surname.localeCompare(y.surname));
-        allRow = renderContacts(list, data);
-        console.log(data);
+        allRow = renderContacts(list, data, keys);
+        // console.log(data);
       }
     });
-
-    /*
-    setTimeout(() => {
-      const contact = createRow({
-        name: 'Максим',
-        surname: 'Лескин',
-        phone: '112',
-      });
-      list.append(contact);
-    }, 2000);
-    */
   };
 
   window.phoneBookInit = init;
