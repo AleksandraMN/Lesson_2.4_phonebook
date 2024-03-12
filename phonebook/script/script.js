@@ -1,21 +1,9 @@
-'use strict';
 
-const {
-  hoverRow,
-  modalControl,
-  deleteControl,
-  formControl,
-} = require('./modules/control');
+import * as modControl from './modules/control.js';
+import {renderPhoneBook, renderContacts} from './modules/render.js';
+import storageModule from './modules/serviceStorage.js';
 
-const {
-  renderPhoneBook,
-  renderContacts,
-} = require('./modules/render');
-
-const {
-  getStorage,
-} = require('./modules/serviceStorage');
-
+const {getStorage} = storageModule;
 
 {
   const init = (selectorApp, title, keys) => {
@@ -36,13 +24,13 @@ const {
     const data = getStorage(keys);
     let allRow = renderContacts(list, data);
 
-    const {closeModal} = modalControl(btnAdd, formOverlay);
-    hoverRow(allRow, logo);
+    const {closeModal} = modControl.modalControl(btnAdd, formOverlay);
+    modControl.hoverRow(allRow, logo);
 
-    deleteControl(btnDel, list);
-    formControl(form, list, closeModal, keys);
+    modControl.deleteControl(btnDel, list);
+    modControl.formControl(form, list, closeModal, keys);
 
-    //  сортировка по алфавиту (не доделан до конца)
+    //  сортировка по алфавиту
     table.addEventListener('click', (e) => {
       const target = e.target;
       if (target.textContent === 'Имя') {
@@ -51,6 +39,7 @@ const {
         }
         data.sort((x, y) => x.name.localeCompare(y.name));
         allRow = renderContacts(list, data, keys);
+        localStorage.setItem('keys', JSON.stringify(data));
       }
       if (target.textContent === 'Фамилия') {
         for (const el of allRow) {
@@ -58,6 +47,7 @@ const {
         }
         data.sort((x, y) => x.surname.localeCompare(y.surname));
         allRow = renderContacts(list, data, keys);
+        localStorage.setItem('keys', JSON.stringify(data));
       }
     });
   };

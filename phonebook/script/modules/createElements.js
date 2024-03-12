@@ -1,4 +1,3 @@
-'use strict';
 
 
 const createContainer = () => {
@@ -170,7 +169,7 @@ const createRow = ({name: firstname, surname, phone}) => {
   return tr;
 };
 
-module.exports = {
+export default {
   createHeader,
   createLogo,
   createMain,

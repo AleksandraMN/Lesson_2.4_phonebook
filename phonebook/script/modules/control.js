@@ -1,17 +1,13 @@
-'use strict';
 
-const {
-  createRow,
-} = require('./createElements');
+import createModule from './createElements.js';
+import storageModule from './serviceStorage.js';
 
+const {createRow} = createModule;
 
-const {
-  setStorage,
-  removeStorage,
-} = require('./serviceStorage');
+const {setStorage, removeStorage} = storageModule;
 
 
-const hoverRow = (allRow, logo) => {
+export const hoverRow = (allRow, logo) => {
   const text = logo.textContent;
 
   allRow.forEach(contact => {
@@ -24,7 +20,7 @@ const hoverRow = (allRow, logo) => {
   });
 };
 
-const modalControl = (btnAdd, formOverlay) => {
+export const modalControl = (btnAdd, formOverlay) => {
   const openModal = () => {
     formOverlay.classList.add('is-visible');
   };
@@ -49,7 +45,7 @@ const modalControl = (btnAdd, formOverlay) => {
 };
 
 
-const deleteControl = (btnDel, list) => {
+export const deleteControl = (btnDel, list) => {
   btnDel.addEventListener('click', () => {
     document.querySelectorAll('.delete').forEach(del => {
       del.classList.toggle('is-visible');
@@ -65,11 +61,11 @@ const deleteControl = (btnDel, list) => {
   });
 };
 
-const addContactPage = (contact, list) => {
+export const addContactPage = (contact, list) => {
   list.append(createRow(contact));
 };
 
-const formControl = (form, list, closeModal, keys) => {
+export const formControl = (form, list, closeModal, keys) => {
   form.addEventListener('submit', e => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -82,10 +78,4 @@ const formControl = (form, list, closeModal, keys) => {
   });
 };
 
-module.exports = {
-  hoverRow,
-  modalControl,
-  deleteControl,
-  formControl,
-};
 

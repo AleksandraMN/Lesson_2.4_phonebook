@@ -1,4 +1,3 @@
-'use strict';
 
 
 const getStorage = (keys) => {
@@ -26,7 +25,7 @@ const removeStorage = (value) => {
 };
 
 
-module.exports = {
+export default {
   getStorage,
   setStorage,
   removeStorage,
